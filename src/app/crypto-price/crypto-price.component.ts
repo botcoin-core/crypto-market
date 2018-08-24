@@ -40,8 +40,10 @@ export class CryptoPriceComponent implements OnInit {
   private receiveData: any;
   private cryptoNames: string[];
   private cryptoImages: string[];
+  private cryptoSymbolNameMap: any[];
   private cryptoLastPrices: number[];
   private cryptoPriceCompare: number[];
+  private cryptoRanks: any[];
 
   private _placeholderBase64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAABS2lUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4KPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxNDAgNzkuMTYwNDUxLCAyMDE3LzA1LzA2LTAxOjA4OjIxICAgICAgICAiPgogPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4KICA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIi8+CiA8L3JkZjpSREY+CjwveDp4bXBtZXRhPgo8P3hwYWNrZXQgZW5kPSJyIj8+LUNEtwAAAClJREFUSIntzTEBAAAIwzDAv+dhAr5UQNNJ6rN5vQMAAAAAAAAAAIDDFsfxAz1KKZktAAAAAElFTkSuQmCC';
   private _placeHolderSafe: SafeUrl;
@@ -148,13 +150,15 @@ export class CryptoPriceComponent implements OnInit {
     this.cryData = [];
     this.cryptoLastPrices = [];
     this.cryptoPriceCompare = [];
+    this.cryptoRanks = [];
     this.cryptoNames = this._data.getNamesFull();
     this.cryptoImages = this._data.getImagesFull();
+    this.cryptoSymbolNameMap = this._data.getSymbolNameMap();
     this._placeHolderSafe = this._sanitizer.bypassSecurityTrustUrl(this._placeholderBase64);
 
     this._data.getPricesFull()
       .subscribe(res => {
-        this.receiveData = res.DISPLAY;
+        this.receiveData = res.RAW;
         //console.log(this.receiveData);
 
         let coinKeys: any = Object.keys(this.receiveData);
@@ -163,30 +167,42 @@ export class CryptoPriceComponent implements OnInit {
         // Price compare first time check
         if (this.cryptoLastPrices.length === 0) {
           for (let _i = 0; _i < coinKeys.length; _i++) {
-            let _currentPrice = parseFloat((coinValues[_i].USD.PRICE).substring(2).replace(/,/g, ''));
+            //let _currentPrice = parseFloat((coinValues[_i].USD.PRICE).substring(2).replace(/,/g, ''));
+            let _currentPrice = parseFloat((coinValues[_i].USD.PRICE);
             this.cryptoLastPrices[_i] = _currentPrice;
             this.cryptoPriceCompare[_i] = _currentPrice - this.cryptoLastPrices[_i];
+            this.cryptoRanks[_i] = _i + 1;
           }
         } else {
           for (let _i = 0; _i < coinKeys.length; _i++) {
-            this.cryptoPriceCompare[_i] = (parseFloat((coinValues[_i].USD.PRICE).substring(2).replace(/,/g, '')) -
-              this.cryptoLastPrices[_i]);
+            //this.cryptoPriceCompare[_i] = (parseFloat((coinValues[_i].USD.PRICE).substring(2).replace(/,/g, '')) - this.cryptoLastPrices[_i]);
+            this.cryptoPriceCompare[_i] = parseFloat((coinValues[_i].USD.PRICE) - this.cryptoLastPrices[_i]);
+            this.cryptoRanks[_i] = _i + 1;
           }
         }
         //console.log(this.cryptoLastPrices);
 
+        coinValues.sort((a, b) => b.USD.MKTCAP - a.USD.MKTCAP);
+
+        for (let _i = 0; _i < coinValues.length; _i++) {
+            this.cryptoRanks[coinValues[_i].USD.FROMSYMBOL] = _i + 1;
+        }
+
         for (let _i = 0; _i < coinKeys.length; _i++) {
           this.cryData[coinKeys[_i]] = {
+            rank: this.cryptoRanks[coinKeys[_i]],
             image: this.cryptoImages[_i],
             name: this.cryptoNames[_i],
             symbol: coinKeys[_i],
             price: coinValues[_i].USD.PRICE,
             marketCap: coinValues[_i].USD.MKTCAP,
-            change24Num: parseFloat((coinValues[_i].USD.CHANGE24HOUR).substring(2).replace(/,/g, '')),
+            //change24Num: parseFloat((coinValues[_i].USD.CHANGE24HOUR).substring(2).replace(/,/g, '')),
+            change24Num: parseFloat(coinValues[_i].USD.CHANGE24HOUR),
             priceCompare: this.cryptoPriceCompare[_i]
           }
 
-          this.cryptoLastPrices[_i] = parseFloat((coinValues[_i].USD.PRICE).substring(2).replace(/,/g, ''));
+          //this.cryptoLastPrices[_i] = parseFloat((coinValues[_i].USD.PRICE).substring(2).replace(/,/g, ''));
+          this.cryptoLastPrices[_i] = parseFloat((coinValues[_i].USD.PRICE));
           this.cryptos = JSON.parse(JSON.stringify(Object.values(this.cryData)));
         }
         //console.log(Object.values(this.cryData));

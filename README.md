@@ -35,6 +35,11 @@ Run `ng build` to build the project. The build artifacts will be stored in the `
 Because `ng serve` does not work with service workers, you must use a separate HTTP server to test your project locally. You can use any HTTP server. The example below uses the http-server package from npm. To reduce the possibility of conflicts, test on a dedicated port.
 
 ```bash
+ng build
+ng update @angular/cli
+ng update @angular/cli --migrate-only --from=1.7.4
+npm install --save-dev @angular/cli@v6.1.4
+
 cd dist
 npx http-server -p 8080
 ```

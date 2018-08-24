@@ -11,66 +11,66 @@ export class DataService {
   private result: any;
   // Currently 60 coins in data list
   private symbolnameData: any = {
-    'Bitcoin': 'BTC',
-    'Ethereum': 'ETH',
-    'Ripple': 'XRP',
-    'Bitcoin Cash': 'BCH',
-    'Litecoin': 'LTC',
-    'Cardano': 'ADA',
+    'BTC': 'Bitcoin',
+    'ETH': 'Ethereum',
+    'XRP': 'Ripple',
+    'BCH': 'Bitcoin Cash',
+    'LTC': 'Litecoin',
+    'ADA': 'Cardano',
     'NEO': 'NEO',
-    'Stellar': 'XLM',
-    'Monero': 'XMR',
+    'XLM': 'Stellar',
+    'XMR': 'Monero',
     'EOS': 'EOS',
-    'IOTA': 'IOT',
-    'Dash': 'DASH',
-    'NEM': 'XEM',
-    'TRON': 'TRX',
-    'Eth Classic': 'ETC',
-    'Tether': 'USDT',
-    'VeChain': 'VEN',
-    'Qtum': 'QTUM',
-    'Nano': 'XRB',
-    'Lisk': 'LSK',
-    'Bitcoin Gold': 'BTG',
-    'OmiseGo': 'OMG',
-    'ICON': 'ICX',
-    'Zcash': 'ZEC',
-    'Digix DAO': 'DGD',
-    'Binance Coin': 'BNB',
-    'Steem': 'STEEM',
-    'Verge': 'XVG',
-    'Stratis': 'STRAT',
-    'Populous': 'PPT',
-    'ByteCoin': 'BCN',
-    'Waves': 'WAVES',
-    'Siacoin': 'SC',
-    'Status': 'SNT',
-    'RChain': 'RHOC',
-    'Maker': 'MKR',
-    'DogeCoin': 'DOGE',
-    'Bitshares': 'BTS',
-    'Decred': 'DCR',
-    'Aeternity': 'AE',
-    'Waltonchain': 'WTC',
-    'Augur': 'REP',
-    'Electroneum': 'ETN',
-    '0x': 'ZRX',
-    'Komodo': 'KMD',
-    'Bytom': 'BTM',
+    'IOT': 'IOTA',
+    'DASH': 'Dash',
+    'XEM': 'NEM',
+    'TRX': 'TRON',
+    'ETC': 'Eth Classic',
+    'USDT': 'Tether',
+    'VEN': 'VeChain',
+    'QTUM': 'Qtum',
+    'XRB': 'Nano',
+    'LSK': 'Lisk',
+    'BTG': 'Bitcoin Gold',
+    'OMG': 'OmiseGo',
+    'ICX': 'ICON',
+    'ZEC': 'Zcash',
+    'DGD': 'Digix DAO',
+    'BNB': 'Binance Coin',
+    'STEEM': 'Steem',
+    'XVG': 'Verge',
+    'STRAT': 'Stratis',
+    'PPT': 'Populous',
+    'BCN': 'ByteCoin',
+    'WAVES': 'Waves',
+    'SC': 'Siacoin',
+    'SNT': 'Status',
+    'RHOC': 'RChain',
+    'MKR': 'Maker',
+    'DOGE': 'DogeCoin',
+    'BTS': 'Bitshares',
+    'DCR': 'Decred',
+    'AE': 'Aeternity',
+    'WTC': 'Waltonchain',
+    'REP': 'Augur',
+    'ETN': 'Electroneum',
+    'ZRX': '0x',
+    'KMD': 'Komodo',
+    'BTM': 'Bytom',
     'ARK': 'ARK',
-    'Veritaseum': 'VERI',
-    'Ardor': 'ARDR',
-    'Golem': 'GNT',
-    'Dragonchain': 'DRGN',
-    'Hshare': 'HSR',
+    'VERI': 'Veritaseum',
+    'ARDR': 'Ardor',
+    'GNT': 'Golem',
+    'DRGN': 'Dragonchain',
+    'HSR': 'Hshare',
     'BAT': 'BAT',
-    'Cryptonex': 'CNX',
-    'SysCoin': 'SYS',
-    'Zilliqa': 'ZIL',
-    'KuCoin': 'KCS',
-    'DigiByte': 'DGB',
-    'Ethos': 'BQX',
-    'Gas': 'GAS'
+    'CNX': 'Cryptonex',
+    'SYS': 'SysCoin',
+    'ZIL': 'Zilliqa',
+    'KCS': 'KuCoin',
+    'DGB': 'DigiByte',
+    'BQX': 'Ethos',
+    'GAS': 'Gas'
   };
   private defaultDataCopy: any = { ...this.symbolnameData };
 
@@ -79,7 +79,7 @@ export class DataService {
   private imageurlSuffix: string[];
   private images: any[];
 
-  private timer = Observable.timer(0, 15000);
+  private timer = Observable.timer(0, 150000);
 
   public _previousIndex: number = null;
   public _previousData: any = null;
@@ -176,6 +176,26 @@ export class DataService {
         break;
       }
 
+      case "marketCap": {
+        if (sortOrder === "ascend") {
+          this.symbolnameData = Object.keys(this.symbolnameData).sort((a, b) => this.symbolnameData[a].localeCompare(this.symbolnameData[b]))
+            .reduce((r, k) => (r[k] = this.symbolnameData[k], r), {});
+          // console.log(this.symbolnameData);
+        } else if (sortOrder === "descend") {
+          this.symbolnameData = Object.keys(this.symbolnameData).sort((a, b) => this.symbolnameData[b].localeCompare(this.symbolnameData[a]))
+            .reduce((r, k) => (r[k] = this.symbolnameData[k], r), {});
+        } else {
+          if (!this._filterd) {
+            this.symbolnameData = this.defaultDataCopy;
+          } else {
+            this.symbolnameData = this._previousData;
+            //console.log("Use previous data");
+          }
+        }
+        //console.log(this.symbolnameData);
+        break;
+      }
+
       default: {
         //console.log("sort default called");
         this.symbolnameData = this.defaultDataCopy;
@@ -196,7 +216,7 @@ export class DataService {
 
   // Fetch price data every 15 seconds
   getPricesFull(): Observable<any> {
-    let coinlist: string[] = Object.values(this.symbolnameData);
+    let coinlist: string[] = Object.keys(this.symbolnameData);
     //console.log(orderedData);
     this.priceMultiurl = "https://min-api.cryptocompare.com/data/pricemultifull?fsyms=" + coinlist.join() + "&tsyms=USD&extraParams=Cryptocurrency_Market";
 
@@ -213,6 +233,11 @@ export class DataService {
       .pipe(catchError(this.handleError('getPriceSingle', [])));
   }
 
+  // Return map object
+  getSymbolNameMap(): any[] {
+    return this.symbolnameData;
+  }
+
   // Return all coin names as arrays
   getNamesFull(): string[] {
     //console.log(Object.keys(this.sortData(this.symbolnameData, sortOrder)));
@@ -226,7 +251,7 @@ export class DataService {
 
   // Get all img path
   getImagesFull(): any[] {
-    let coinlist: string[] = Object.values(this.symbolnameData);
+    let coinlist: string[] = Object.keys(this.symbolnameData);
     this.images = [];
 
     this.imageurlSuffix = coinlist.map(res => res.toLowerCase());
